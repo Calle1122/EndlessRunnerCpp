@@ -5,15 +5,6 @@
 
 void ARunnerGameModeBase::BeginPlay()
 {
-	if(GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Doing Begin Play"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Game Engine not Initialized"));
-	}
-	
 	CreateInitialTiles();
 }
 
@@ -31,10 +22,19 @@ void ARunnerGameModeBase::AddTile()
 
 	if(World)
 	{
-		ARunTile* Tile = GetWorld()->SpawnActor<ARunTile>(TileClass, NextTilePoint);
+		ARunTile* Tile;
+		
+		if(!NextTileArrow)
+		{
+			Tile = GetWorld()->SpawnActor<ARunTile>(TileClass, FVector(0,0,0), FRotator(0,0,0));
+		}
+		else
+		{
+			Tile = GetWorld()->SpawnActor<ARunTile>(TileClass, NextTileArrow->GetComponentTransform());
+		}
 		if(Tile)
 		{
-			NextTilePoint = Tile->GetAttachTransform();
+			NextTileArrow = Tile->GetAttachArrow();
 		}
 	}
 }

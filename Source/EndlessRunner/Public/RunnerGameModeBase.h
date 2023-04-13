@@ -23,7 +23,7 @@ public:
 	int NumberOfInitialTiles = 10;
 
 	UPROPERTY(VisibleInstanceOnly, Category="Runtime")
-	FTransform NextTilePoint;
+	UArrowComponent* NextTileArrow;
 	
 	UFUNCTION(BlueprintCallable)
 	void CreateInitialTiles();
