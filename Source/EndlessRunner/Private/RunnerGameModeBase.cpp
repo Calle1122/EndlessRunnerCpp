@@ -26,11 +26,12 @@ void ARunnerGameModeBase::AddTile()
 		
 		if(!NextTileArrow)
 		{
-			Tile = GetWorld()->SpawnActor<ARunTile>(TileClass, FVector(0,0,0), FRotator(0,0,0));
+			Tile = GetWorld()->SpawnActor<ARunTile>(BaseTileClass, FVector(0,0,0), FRotator(0,0,0));
 		}
 		else
 		{
-			Tile = GetWorld()->SpawnActor<ARunTile>(TileClass, NextTileArrow->GetComponentTransform());
+			int32 index = FMath::RandRange(0, EasyTiles.Num() - 1);
+			Tile = GetWorld()->SpawnActor<ARunTile>(EasyTiles[index], NextTileArrow->GetComponentTransform());
 		}
 		if(Tile)
 		{

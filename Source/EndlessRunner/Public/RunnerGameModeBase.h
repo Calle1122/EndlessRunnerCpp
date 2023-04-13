@@ -17,7 +17,10 @@ class ENDLESSRUNNER_API ARunnerGameModeBase : public AGameModeBase
 
 public:
 	UPROPERTY(EditAnywhere, Category="GameConfig")
-	TSubclassOf<ARunTile> TileClass;
+	TSubclassOf<ARunTile> BaseTileClass;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	TArray<TSubclassOf<ARunTile>> EasyTiles;
 	
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	int NumberOfInitialTiles = 10;
