@@ -2,9 +2,14 @@
 
 
 #include "EndlessRunner/Public/RunnerGameModeBase.h"
+#include "RunGameHUD.h"
+#include "Blueprint/UserWidget.h"
 
 void ARunnerGameModeBase::BeginPlay()
 {
+	URunGameHUD* NewWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
+	NewWidget->AddToViewport(9999);
+
 	CreateInitialTiles();
 }
 

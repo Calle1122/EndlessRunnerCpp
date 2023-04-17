@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RunGameHUD.h"
 #include "RunTile.h"
 #include "GameFramework/GameModeBase.h"
 #include "RunnerGameModeBase.generated.h"
@@ -28,6 +29,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	int PlayerHealth = 3;
 
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<URunGameHUD> UserInterface;
+
 	UPROPERTY(VisibleInstanceOnly, Category="Runtime")
 	UArrowComponent* NextTileArrow;
 	
@@ -42,7 +46,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EndRun();
-
+	
 protected:
 	virtual void BeginPlay() override;
 };
