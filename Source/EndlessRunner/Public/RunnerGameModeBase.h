@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	int NumberOfInitialTiles = 10;
 
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	int PlayerHealth = 3;
+
 	UPROPERTY(VisibleInstanceOnly, Category="Runtime")
 	UArrowComponent* NextTileArrow;
 	
@@ -33,6 +36,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddTile();
+
+	UFUNCTION(BlueprintCallable)
+	void ReduceHealth();
+
+	UFUNCTION(BlueprintCallable)
+	void EndRun();
 
 protected:
 	virtual void BeginPlay() override;

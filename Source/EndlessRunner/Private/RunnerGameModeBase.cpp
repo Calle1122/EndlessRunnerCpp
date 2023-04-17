@@ -40,5 +40,25 @@ void ARunnerGameModeBase::AddTile()
 	}
 }
 
+void ARunnerGameModeBase::ReduceHealth()
+{
+	PlayerHealth--;
+
+	if(PlayerHealth<=0)
+	{
+		EndRun();
+	}
+}
+
+void ARunnerGameModeBase::EndRun()
+{
+	//TODO: Implement Game Over and Restart
+
+	if(GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player is DEAD"));
+	}
+}
+
 
 
