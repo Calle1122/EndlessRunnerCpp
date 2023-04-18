@@ -15,6 +15,12 @@ class ENDLESSRUNNER_API ARunTile : public AActor
 	
 public:
 
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	TArray<UArrowComponent*> ProjectilePositions;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	TSubclassOf<AActor> Projectile;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
 	USceneComponent* RootSceneComponent;
 

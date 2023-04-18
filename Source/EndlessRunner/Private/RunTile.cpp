@@ -25,6 +25,13 @@ ARunTile::ARunTile()
 	DestroyTileTriggerBox->SetupAttachment(RootSceneComponent);
 	DestroyTileTriggerBox->SetBoxExtent(FVector(50.f, 500.f, 250.f));
 	DestroyTileTriggerBox->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+
+	for (int i = 0; i < 10 + 1; i++)
+	{
+		UArrowComponent* NewArrow = CreateDefaultSubobject<UArrowComponent>(FName(FString::FromInt(i)));
+		NewArrow->SetupAttachment(RootComponent);
+		ProjectilePositions.Add( NewArrow );
+	}
 }
 
 // Called when the game starts or when spawned
@@ -36,6 +43,17 @@ void ARunTile::BeginPlay()
 	check(RunGameMode);
 
 	DestroyTileTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ARunTile::OnDestroyBoxOverlap);
+
+	for (UArrowComponent* ProjectilePos : ProjectilePositions)
+	{
+		int RandomPick = FMath::RandRange(0, 100);
+		if(RandomPick<RunGameMode->ProjectilePercentChance)
+		{
+			//Spawn projectile for target position
+			AActor* NewProjectile = GetWorld()->SpawnActor<AActor>(Projectile, ProjectilePos->GetComponentLocation(), FRotator(0,0,0));
+			NewProjectile->AttachToComponent(ProjectilePos, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		}
+	}
 }
 
 // Called every frame

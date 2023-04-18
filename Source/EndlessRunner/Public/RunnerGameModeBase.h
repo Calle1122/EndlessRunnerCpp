@@ -17,6 +17,8 @@ class ENDLESSRUNNER_API ARunnerGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	ARunnerGameModeBase();
+	
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	TSubclassOf<ARunTile> BaseTileClass;
 
@@ -28,6 +30,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	int PlayerHealth = 3;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	int ProjectilePercentChance = 1;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	float ScoreMultiplier = 1.f;
 
 	UPROPERTY(EditAnywhere, Category="UI")
 	TSubclassOf<URunGameHUD> UserInterface;
@@ -46,7 +54,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EndRun();
+
+	URunGameHUD* NewWidget;
+	float Score;
 	
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
 };

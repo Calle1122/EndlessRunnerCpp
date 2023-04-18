@@ -29,5 +29,5 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UImage* Health3Img;
 
-	void ToggleHealth(UImage* targetImage);
+	void RemoveHealth(UImage* targetImage);
 };

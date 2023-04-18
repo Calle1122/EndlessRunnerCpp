@@ -4,13 +4,28 @@
 #include "EndlessRunner/Public/RunnerGameModeBase.h"
 #include "RunGameHUD.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 
 void ARunnerGameModeBase::BeginPlay()
 {
-	URunGameHUD* NewWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
+	NewWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
 	NewWidget->AddToViewport(9999);
 
 	CreateInitialTiles();
+}
+
+void ARunnerGameModeBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	
+	Score+=DeltaSeconds*ScoreMultiplier;
+	NewWidget->ScoreTxt->SetText(FText::FromString(FString::FromInt((int)Score)));
+}
+
+ARunnerGameModeBase::ARunnerGameModeBase()
+{
+	PrimaryActorTick.bStartWithTickEnabled = true;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ARunnerGameModeBase::CreateInitialTiles()
@@ -49,6 +64,19 @@ void ARunnerGameModeBase::ReduceHealth()
 {
 	PlayerHealth--;
 
+	switch (PlayerHealth)
+	{
+	case 2:
+		NewWidget->RemoveHealth(NewWidget->Health3Img);
+		break;
+	case 1:
+		NewWidget->RemoveHealth(NewWidget->Health2Img);
+		break;
+	case 0:
+		NewWidget->RemoveHealth(NewWidget->Health1Img);
+		break;
+	}
+	
 	if(PlayerHealth<=0)
 	{
 		EndRun();

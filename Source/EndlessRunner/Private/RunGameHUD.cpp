@@ -5,14 +5,7 @@
 
 #include "Components/Image.h"
 
-void URunGameHUD::ToggleHealth(UImage* targetImage)
+void URunGameHUD::RemoveHealth(UImage* targetImage)
 {
-	if(targetImage->IsVisible())
-	{
-		targetImage->SetBrushFromTexture(EmptyHeartTexture);
-	}
-	else
-	{
-		targetImage->SetBrushFromTexture(FullHeartTexture);
-	}
+	targetImage->SetBrushFromTexture(EmptyHeartTexture);
 }
