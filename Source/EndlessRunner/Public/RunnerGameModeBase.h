@@ -34,6 +34,8 @@ public:
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	int ProjectilePercentChance = 1;
 
+	float ProjectileChanceFactor = 0;
+
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	float ScoreMultiplier = 1.f;
 

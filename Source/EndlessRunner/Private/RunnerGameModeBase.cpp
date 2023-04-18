@@ -20,6 +20,13 @@ void ARunnerGameModeBase::Tick(float DeltaSeconds)
 	
 	Score+=DeltaSeconds*ScoreMultiplier;
 	NewWidget->ScoreTxt->SetText(FText::FromString(FString::FromInt((int)Score)));
+
+	ProjectileChanceFactor += DeltaSeconds/5;
+	if(ProjectileChanceFactor>100.f)
+	{
+		ProjectileChanceFactor = 100.f;
+	}
+	ProjectilePercentChance = (int)ProjectileChanceFactor;
 }
 
 ARunnerGameModeBase::ARunnerGameModeBase()
