@@ -14,6 +14,7 @@ void ARunnerGameModeBase::EnableDamageTaking()
 
 	CharacterMesh->SetMaterial(0, BaseMat1);
 	CharacterMesh->SetMaterial(1, BaseMat2);
+	CharacterMesh->SetMaterial(2, BaseMat3);
 }
 
 void ARunnerGameModeBase::BeginPlay()
@@ -96,6 +97,7 @@ void ARunnerGameModeBase::ReduceHealth()
 
 		CharacterMesh->SetMaterial(0, IMaterial);
 		CharacterMesh->SetMaterial(1, IMaterial);
+		CharacterMesh->SetMaterial(2, IMaterial);
 		
 		GetWorldTimerManager().SetTimer(IFrameHandle, this, &ARunnerGameModeBase::EnableDamageTaking, IFrameTime, false);
 		

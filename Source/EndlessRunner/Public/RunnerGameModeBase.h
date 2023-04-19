@@ -78,6 +78,8 @@ public:
 	UMaterialInterface* BaseMat1;
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	UMaterialInterface* BaseMat2;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* BaseMat3;
 	
 	UPROPERTY()
 	FTimerHandle IFrameHandle;
