@@ -57,8 +57,24 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EndRun();
 
+	UFUNCTION(BlueprintCallable)
+	void ChangeMultiplier(float NewMultiplier);
+	float MultiplierAddTimer = 0.f;
+
 	URunGameHUD* NewWidget;
 	float Score;
+
+	//I Frame Handling
+	bool IFrameMode;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	float IFrameTime = 1.f;
+	
+	UPROPERTY()
+	FTimerHandle IFrameHandle;
+
+	UFUNCTION()
+	void EnableDamageTaking();
 	
 protected:
 	virtual void BeginPlay() override;

@@ -6,6 +6,11 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 
+void ARunnerGameModeBase::EnableDamageTaking()
+{
+	IFrameMode=false;
+}
+
 void ARunnerGameModeBase::BeginPlay()
 {
 	NewWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
@@ -20,6 +25,13 @@ void ARunnerGameModeBase::Tick(float DeltaSeconds)
 	
 	Score+=DeltaSeconds*ScoreMultiplier;
 	NewWidget->ScoreTxt->SetText(FText::FromString(FString::FromInt((int)Score)));
+
+	MultiplierAddTimer+=DeltaSeconds/5;
+	if(MultiplierAddTimer>=1.f)
+	{
+		MultiplierAddTimer=0.f;
+		ChangeMultiplier(ScoreMultiplier+.1f);
+	}
 
 	ProjectileChanceFactor += DeltaSeconds/5;
 	if(ProjectileChanceFactor>100.f)
@@ -69,24 +81,29 @@ void ARunnerGameModeBase::AddTile()
 
 void ARunnerGameModeBase::ReduceHealth()
 {
-	PlayerHealth--;
-
-	switch (PlayerHealth)
+	if(IFrameMode==false)
 	{
-	case 2:
-		NewWidget->RemoveHealth(NewWidget->Health3Img);
-		break;
-	case 1:
-		NewWidget->RemoveHealth(NewWidget->Health2Img);
-		break;
-	case 0:
-		NewWidget->RemoveHealth(NewWidget->Health1Img);
-		break;
-	}
+		PlayerHealth--;
+		IFrameMode=true;
+		GetWorldTimerManager().SetTimer(IFrameHandle, this, &ARunnerGameModeBase::EnableDamageTaking, IFrameTime, false);
+		
+		switch (PlayerHealth)
+		{
+		case 2:
+			NewWidget->RemoveHealth(NewWidget->Health3Img);
+			break;
+		case 1:
+			NewWidget->RemoveHealth(NewWidget->Health2Img);
+			break;
+		case 0:
+			NewWidget->RemoveHealth(NewWidget->Health1Img);
+			break;
+		}
 	
-	if(PlayerHealth<=0)
-	{
-		EndRun();
+		if(PlayerHealth<=0)
+		{
+			EndRun();
+		}
 	}
 }
 
@@ -98,6 +115,16 @@ void ARunnerGameModeBase::EndRun()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player is DEAD"));
 	}
+}
+
+void ARunnerGameModeBase::ChangeMultiplier(float NewMultiplier)
+{
+	NewMultiplier*=10;
+	NewMultiplier = FMath::CeilToInt(NewMultiplier);
+	NewMultiplier/=10;
+	
+	ScoreMultiplier = NewMultiplier;
+	NewWidget->UpdateMultiplierTxt(NewMultiplier);
 }
 
 

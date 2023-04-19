@@ -23,6 +23,8 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UTextBlock* ScoreTxt;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UTextBlock* ScoreMultiplierTxt;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UImage* Health1Img;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UImage* Health2Img;
@@ -30,4 +32,6 @@ public:
 	class UImage* Health3Img;
 
 	void RemoveHealth(UImage* targetImage);
+
+	void UpdateMultiplierTxt(float NewMultiplier);
 };
