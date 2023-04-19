@@ -5,10 +5,15 @@
 #include "RunGameHUD.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 
 void ARunnerGameModeBase::EnableDamageTaking()
 {
 	IFrameMode=false;
+
+	CharacterMesh->SetMaterial(0, BaseMat1);
+	CharacterMesh->SetMaterial(1, BaseMat2);
 }
 
 void ARunnerGameModeBase::BeginPlay()
@@ -17,6 +22,9 @@ void ARunnerGameModeBase::BeginPlay()
 	NewWidget->AddToViewport(9999);
 
 	CreateInitialTiles();
+
+	ACharacter* MyCharacter = Cast<ACharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	CharacterMesh = MyCharacter->GetMesh();
 }
 
 void ARunnerGameModeBase::Tick(float DeltaSeconds)
@@ -85,6 +93,10 @@ void ARunnerGameModeBase::ReduceHealth()
 	{
 		PlayerHealth--;
 		IFrameMode=true;
+
+		CharacterMesh->SetMaterial(0, IMaterial);
+		CharacterMesh->SetMaterial(1, IMaterial);
+		
 		GetWorldTimerManager().SetTimer(IFrameHandle, this, &ARunnerGameModeBase::EnableDamageTaking, IFrameTime, false);
 		
 		switch (PlayerHealth)

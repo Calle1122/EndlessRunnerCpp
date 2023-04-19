@@ -65,10 +65,19 @@ public:
 	float Score;
 
 	//I Frame Handling
+	USkeletalMeshComponent* CharacterMesh;
+	
 	bool IFrameMode;
 
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	float IFrameTime = 1.f;
+	
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* IMaterial;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* BaseMat1;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* BaseMat2;
 	
 	UPROPERTY()
 	FTimerHandle IFrameHandle;
