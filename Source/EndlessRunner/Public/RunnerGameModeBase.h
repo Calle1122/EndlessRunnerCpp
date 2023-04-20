@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EndScreenHUD.h"
 #include "RunGameHUD.h"
 #include "RunTile.h"
 #include "GameFramework/GameModeBase.h"
@@ -42,6 +43,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="UI")
 	TSubclassOf<URunGameHUD> UserInterface;
 
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<UEndScreenHUD> EndScreenInterface;
+
 	UPROPERTY(VisibleInstanceOnly, Category="Runtime")
 	UArrowComponent* NextTileArrow;
 	
@@ -61,7 +65,9 @@ public:
 	void ChangeMultiplier(float NewMultiplier);
 	float MultiplierAddTimer = 0.f;
 
-	URunGameHUD* NewWidget;
+	URunGameHUD* RunWidget;
+	UEndScreenHUD* EndScreenWidget;
+	
 	float Score;
 
 	//I Frame Handling

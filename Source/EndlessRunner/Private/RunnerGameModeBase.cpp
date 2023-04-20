@@ -19,8 +19,8 @@ void ARunnerGameModeBase::EnableDamageTaking()
 
 void ARunnerGameModeBase::BeginPlay()
 {
-	NewWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
-	NewWidget->AddToViewport(9999);
+	RunWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
+	RunWidget->AddToViewport(9999);
 
 	CreateInitialTiles();
 
@@ -33,7 +33,7 @@ void ARunnerGameModeBase::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	
 	Score+=DeltaSeconds*ScoreMultiplier;
-	NewWidget->ScoreTxt->SetText(FText::FromString(FString::FromInt((int)Score)));
+	RunWidget->ScoreTxt->SetText(FText::FromString(FString::FromInt((int)Score)));
 
 	MultiplierAddTimer+=DeltaSeconds/5;
 	if(MultiplierAddTimer>=1.f)
@@ -104,13 +104,13 @@ void ARunnerGameModeBase::ReduceHealth()
 		switch (PlayerHealth)
 		{
 		case 2:
-			NewWidget->RemoveHealth(NewWidget->Health3Img);
+			RunWidget->RemoveHealth(RunWidget->Health3Img);
 			break;
 		case 1:
-			NewWidget->RemoveHealth(NewWidget->Health2Img);
+			RunWidget->RemoveHealth(RunWidget->Health2Img);
 			break;
 		case 0:
-			NewWidget->RemoveHealth(NewWidget->Health1Img);
+			RunWidget->RemoveHealth(RunWidget->Health1Img);
 			break;
 		}
 	
@@ -123,12 +123,13 @@ void ARunnerGameModeBase::ReduceHealth()
 
 void ARunnerGameModeBase::EndRun()
 {
-	//TODO: Implement Game Over and Restart
+	RunWidget->RemoveFromParent();
+	
+	EndScreenWidget = CreateWidget<UEndScreenHUD>(GetWorld()->GetFirstPlayerController(), EndScreenInterface);
+	EndScreenWidget->AddToViewport(9999);
 
-	if(GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player is DEAD"));
-	}
+	EndScreenWidget->InitializeEndScreen();
+	EndScreenWidget->RegisterScore();
 }
 
 void ARunnerGameModeBase::ChangeMultiplier(float NewMultiplier)
@@ -138,7 +139,7 @@ void ARunnerGameModeBase::ChangeMultiplier(float NewMultiplier)
 	NewMultiplier/=10;
 	
 	ScoreMultiplier = NewMultiplier;
-	NewWidget->UpdateMultiplierTxt(NewMultiplier);
+	RunWidget->UpdateMultiplierTxt(NewMultiplier);
 }
 
 
