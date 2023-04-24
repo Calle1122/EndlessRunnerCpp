@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EndScreenHUD.h"
+#include "RunGameHUD.h"
 #include "RunTile.h"
 #include "GameFramework/GameModeBase.h"
 #include "RunnerGameModeBase.generated.h"
@@ -16,14 +18,36 @@ class ENDLESSRUNNER_API ARunnerGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	ARunnerGameModeBase();
+	
 	UPROPERTY(EditAnywhere, Category="GameConfig")
-	TSubclassOf<ARunTile> TileClass;
+	TSubclassOf<ARunTile> BaseTileClass;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	TArray<TSubclassOf<ARunTile>> EasyTiles;
 	
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	int NumberOfInitialTiles = 10;
 
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	int PlayerHealth = 3;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	int ProjectilePercentChance = 1;
+
+	float ProjectileChanceFactor = 0;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	float ScoreMultiplier = 1.f;
+
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<URunGameHUD> UserInterface;
+
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<UEndScreenHUD> EndScreenInterface;
+
 	UPROPERTY(VisibleInstanceOnly, Category="Runtime")
-	FTransform NextTilePoint;
+	UArrowComponent* NextTileArrow;
 	
 	UFUNCTION(BlueprintCallable)
 	void CreateInitialTiles();
@@ -31,6 +55,46 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddTile();
 
+	UFUNCTION(BlueprintCallable)
+	void ReduceHealth();
+
+	UFUNCTION(BlueprintCallable)
+	void EndRun();
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeMultiplier(float NewMultiplier);
+	float MultiplierAddTimer = 0.f;
+
+	URunGameHUD* RunWidget;
+	UEndScreenHUD* EndScreenWidget;
+	
+	float Score;
+
+	//I Frame Handling
+	USkeletalMeshComponent* CharacterMesh;
+	
+	bool IFrameMode;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	float IFrameTime = 1.f;
+	
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* IMaterial;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* BaseMat1;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* BaseMat2;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* BaseMat3;
+	
+	UPROPERTY()
+	FTimerHandle IFrameHandle;
+
+	UFUNCTION()
+	void EnableDamageTaking();
+	
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
 };

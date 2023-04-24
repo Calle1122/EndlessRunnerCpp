@@ -79,7 +79,7 @@ void AEndlessRunnerCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AEndlessRunnerCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::Move);
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEndlessRunnerCharacter::Look);
@@ -95,6 +95,7 @@ void AEndlessRunnerCharacter::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
+		/*
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -108,6 +109,16 @@ void AEndlessRunnerCharacter::Move(const FInputActionValue& Value)
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
+		*/
+
+		if(MovementVector.X > 0)
+		{
+			AddActorLocalOffset(FVector(0,135.f,0));
+		}
+		else
+		{
+			AddActorLocalOffset(FVector(0,-135.f,0));
+		}
 	}
 }
 

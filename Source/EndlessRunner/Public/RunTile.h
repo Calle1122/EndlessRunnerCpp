@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ArrowComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "RunTile.generated.h"
 
@@ -14,26 +15,44 @@ class ENDLESSRUNNER_API ARunTile : public AActor
 	
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Component")
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	TArray<UArrowComponent*> ProjectilePositions;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	TSubclassOf<AActor> Projectile;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
 	USceneComponent* RootSceneComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Component")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
 	UStaticMeshComponent* TileMeshComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Component")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
 	UArrowComponent* TileSeamPoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
+	UBoxComponent* DestroyTileTriggerBox;
 	
 	// Sets default values for this actor's properties
 	ARunTile();
 
-	FORCEINLINE const FTransform& GetAttachTransform() const
+	UArrowComponent* GetAttachArrow()
 	{
-		return TileSeamPoint->GetComponentTransform();
+		return TileSeamPoint;
 	}
 
 protected:
 	UPROPERTY(VisibleInstanceOnly)
 	class ARunnerGameModeBase* RunGameMode;
+
+	UPROPERTY()
+	FTimerHandle DestroyTileHandle;
+
+	UFUNCTION()
+	void OnDestroyBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void DestroyTile();
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
