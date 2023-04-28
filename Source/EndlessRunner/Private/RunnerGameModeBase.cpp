@@ -74,12 +74,20 @@ void ARunnerGameModeBase::AddTile()
 		
 		if(!NextTileArrow)
 		{
-			Tile = GetWorld()->SpawnActor<ARunTile>(BaseTileClass, FVector(0,0,0), FRotator(0,0,0));
+			Tile = GetWorld()->SpawnActor<ARunTile>(BaseTileClass, FVector(-50,-250,0), FRotator(0,0,0));
+
+			//Duplicate to right lane
+			FVector TilePos = Tile->GetActorLocation();
+			GetWorld()->SpawnActor<ARunTile>(BaseTileClass, FVector(TilePos.X, FMath::Abs(TilePos.Y), TilePos.Z), FRotator(0, 0, 0));
 		}
 		else
 		{
 			int32 index = FMath::RandRange(0, EasyTiles.Num() - 1);
 			Tile = GetWorld()->SpawnActor<ARunTile>(EasyTiles[index], NextTileArrow->GetComponentTransform());
+
+			//Duplicate to right lane
+			FVector TilePos = Tile->GetActorLocation();
+			GetWorld()->SpawnActor<ARunTile>(EasyTiles[index], FVector(TilePos.X, FMath::Abs(TilePos.Y), TilePos.Z), FRotator(0, 0, 0));
 		}
 		if(Tile)
 		{
@@ -140,6 +148,19 @@ void ARunnerGameModeBase::ChangeMultiplier(float NewMultiplier)
 	
 	ScoreMultiplier = NewMultiplier;
 	RunWidget->UpdateMultiplierTxt(NewMultiplier);
+}
+
+void ARunnerGameModeBase::OnTileDestroy()
+{
+	if(canGenerateTile)
+	{
+		AddTile();	
+		canGenerateTile = false;
+	}
+	else
+	{
+		canGenerateTile = true;
+	}
 }
 
 

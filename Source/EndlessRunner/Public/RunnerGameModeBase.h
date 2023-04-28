@@ -65,6 +65,9 @@ public:
 	void ChangeMultiplier(float NewMultiplier);
 	float MultiplierAddTimer = 0.f;
 
+	UFUNCTION(BlueprintCallable)
+	void OnTileDestroy();
+
 	URunGameHUD* RunWidget;
 	UEndScreenHUD* EndScreenWidget;
 	
@@ -97,4 +100,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaSeconds) override;
+
+private:
+	bool canGenerateTile = true;
 };
