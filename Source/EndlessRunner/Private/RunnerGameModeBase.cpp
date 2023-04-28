@@ -12,9 +12,9 @@ void ARunnerGameModeBase::EnableDamageTaking()
 {
 	IFrameMode=false;
 
-	CharacterMesh->SetMaterial(0, BaseMat1);
-	CharacterMesh->SetMaterial(1, BaseMat2);
-	CharacterMesh->SetMaterial(2, BaseMat3);
+	Player1Mesh->SetMaterial(0, BaseMat1);
+	Player1Mesh->SetMaterial(1, BaseMat2);
+	Player1Mesh->SetMaterial(2, BaseMat3);
 }
 
 void ARunnerGameModeBase::BeginPlay()
@@ -22,10 +22,12 @@ void ARunnerGameModeBase::BeginPlay()
 	RunWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
 	RunWidget->AddToViewport(9999);
 
+	GetWorld()->SpawnActor<AEndlessRunnerCharacter>(Player2Class, FVector(0, 250, 100), FRotator(0, 0, 0));
+	
 	CreateInitialTiles();
-
-	ACharacter* MyCharacter = Cast<ACharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	CharacterMesh = MyCharacter->GetMesh();
+	
+	ACharacter* Player1 = Cast<ACharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	Player1Mesh = Player1->GetMesh();
 }
 
 void ARunnerGameModeBase::Tick(float DeltaSeconds)
@@ -103,9 +105,9 @@ void ARunnerGameModeBase::ReduceHealth()
 		PlayerHealth--;
 		IFrameMode=true;
 
-		CharacterMesh->SetMaterial(0, IMaterial);
-		CharacterMesh->SetMaterial(1, IMaterial);
-		CharacterMesh->SetMaterial(2, IMaterial);
+		Player1Mesh->SetMaterial(0, IMaterial);
+		Player1Mesh->SetMaterial(1, IMaterial);
+		Player1Mesh->SetMaterial(2, IMaterial);
 		
 		GetWorldTimerManager().SetTimer(IFrameHandle, this, &ARunnerGameModeBase::EnableDamageTaking, IFrameTime, false);
 		

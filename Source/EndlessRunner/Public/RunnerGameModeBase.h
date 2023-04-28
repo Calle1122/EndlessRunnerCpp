@@ -6,6 +6,7 @@
 #include "EndScreenHUD.h"
 #include "RunGameHUD.h"
 #include "RunTile.h"
+#include "EndlessRunner/EndlessRunnerCharacter.h"
 #include "GameFramework/GameModeBase.h"
 #include "RunnerGameModeBase.generated.h"
 
@@ -46,6 +47,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="UI")
 	TSubclassOf<UEndScreenHUD> EndScreenInterface;
 
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	TSubclassOf<AEndlessRunnerCharacter> Player2Class;
+
 	UPROPERTY(VisibleInstanceOnly, Category="Runtime")
 	UArrowComponent* NextTileArrow;
 	
@@ -74,7 +78,8 @@ public:
 	float Score;
 
 	//I Frame Handling
-	USkeletalMeshComponent* CharacterMesh;
+	USkeletalMeshComponent* Player1Mesh;
+	USkeletalMeshComponent* Player2Mesh;
 	
 	bool IFrameMode;
 
