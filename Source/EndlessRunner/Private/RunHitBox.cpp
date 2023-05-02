@@ -18,8 +18,25 @@ ARunHitBox::ARunHitBox()
 	DamageBox->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 }
 
+void ARunHitBox::LuckyDestroy()
+{
+	TArray<UActorComponent*> ActorsToDestroy;
+	
+	for (UActorComponent* connectedActor : ConnectedObjects)
+	{
+		ActorsToDestroy.Add(connectedActor);
+	}
+
+	for(UActorComponent* destroyActor : ActorsToDestroy)
+	{
+		destroyActor->DestroyComponent();
+	}
+	
+	this->Destroy();
+}
+
 void ARunHitBox::OnDamageBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AEndlessRunnerCharacter* PlayerCharacter = Cast<AEndlessRunnerCharacter>(OtherActor);
 

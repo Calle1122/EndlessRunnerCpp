@@ -38,7 +38,14 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UImage* P2Health3Img;
 
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* P1LuckyDodgeAnim;
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* P2LuckyDodgeAnim;
+	
 	void RemoveHealth(UImage* targetImage);
 
 	void UpdateMultiplierTxt(float NewMultiplier);
+
+	void PlayLuckyAnimation(int PlayerIndex);
 };

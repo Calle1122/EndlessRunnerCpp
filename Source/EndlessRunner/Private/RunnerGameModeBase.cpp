@@ -3,6 +3,7 @@
 
 #include "EndlessRunner/Public/RunnerGameModeBase.h"
 #include "RunGameHUD.h"
+#include "RunHitBox.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/Character.h"
@@ -114,7 +115,7 @@ void ARunnerGameModeBase::ReduceHealth(int PlayerIndex)
 			Player1Mesh->SetMaterial(1, IMaterial);
 			Player1Mesh->SetMaterial(2, IMaterial);
 		
-			GetWorldTimerManager().SetTimer(IFrameHandle, this, &ARunnerGameModeBase::P1EnableDamageTaking, IFrameTime, false);
+			GetWorldTimerManager().SetTimer(P1IFrameHandle, this, &ARunnerGameModeBase::P1EnableDamageTaking, IFrameTime, false);
 		
 			switch (Player1Health)
 			{
@@ -138,7 +139,7 @@ void ARunnerGameModeBase::ReduceHealth(int PlayerIndex)
 
 	else
 	{
-		if(P1IFrameMode==false)
+		if(P2IFrameMode==false)
 		{
 			Player2Health--;
 			P2IFrameMode=true;
@@ -147,7 +148,7 @@ void ARunnerGameModeBase::ReduceHealth(int PlayerIndex)
 			Player2Mesh->SetMaterial(1, IMaterial);
 			Player2Mesh->SetMaterial(2, IMaterial);
 		
-			GetWorldTimerManager().SetTimer(IFrameHandle, this, &ARunnerGameModeBase::P2EnableDamageTaking, IFrameTime, false);
+			GetWorldTimerManager().SetTimer(P2IFrameHandle, this, &ARunnerGameModeBase::P2EnableDamageTaking, IFrameTime, false);
 		
 			switch (Player2Health)
 			{
@@ -219,6 +220,36 @@ void ARunnerGameModeBase::OnTileDestroy()
 	else
 	{
 		canGenerateTile = true;
+	}
+}
+
+void ARunnerGameModeBase::P1Dodge()
+{
+	if(FMath::RandRange(1, 4) > 3)
+	{
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARunHitBox::StaticClass(), FoundActors);
+		
+		int IndexPicker = FMath::RandRange(0, FoundActors.Num());
+
+		Cast<ARunHitBox>(FoundActors[IndexPicker])->LuckyDestroy();
+		
+		RunWidget->PlayLuckyAnimation(0);
+	}
+}
+
+void ARunnerGameModeBase::P2Dodge()
+{
+	if(FMath::RandRange(1, 4) > 3)
+	{
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARunHitBox::StaticClass(), FoundActors);
+		
+		int IndexPicker = FMath::RandRange(0, FoundActors.Num());
+
+		Cast<ARunHitBox>(FoundActors[IndexPicker])->LuckyDestroy();
+		
+		RunWidget->PlayLuckyAnimation(1);
 	}
 }
 

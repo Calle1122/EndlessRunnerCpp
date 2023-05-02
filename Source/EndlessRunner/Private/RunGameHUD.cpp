@@ -17,3 +17,15 @@ void URunGameHUD::UpdateMultiplierTxt(float NewMultiplier)
 	NewMultiplierString.Append(TEXT("x"));
 	ScoreMultiplierTxt->SetText(FText::FromString(NewMultiplierString));
 }
+
+void URunGameHUD::PlayLuckyAnimation(int PlayerIndex)
+{
+	if(PlayerIndex==0)
+	{
+		PlayAnimation(P1LuckyDodgeAnim);
+	}
+	else
+	{
+		PlayAnimation(P2LuckyDodgeAnim);
+	}
+}

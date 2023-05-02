@@ -71,6 +71,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnTileDestroy();
 
+	UFUNCTION(BlueprintCallable)
+	void P1Dodge();
+	UFUNCTION(BlueprintCallable)
+	void P2Dodge();
+
 	URunGameHUD* RunWidget;
 	UEndScreenHUD* EndScreenWidget;
 	
@@ -105,7 +110,9 @@ public:
 	UMaterialInterface* PinkBaseMat3;
 	
 	UPROPERTY()
-	FTimerHandle IFrameHandle;
+	FTimerHandle P1IFrameHandle;
+	UPROPERTY()
+	FTimerHandle P2IFrameHandle;
 
 	UFUNCTION()
 	void P1EnableDamageTaking();

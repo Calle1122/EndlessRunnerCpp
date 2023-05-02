@@ -5,27 +5,21 @@
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
-#include "RunHitBox.generated.h"
+#include "DodgeBox.generated.h"
 
 UCLASS()
-class ENDLESSRUNNER_API ARunHitBox : public AActor
+class ENDLESSRUNNER_API ADodgeBox : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
+	ADodgeBox();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
-	UBoxComponent* DamageBox;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Config")
-	TArray<UActorComponent*> ConnectedObjects;
-	
-	ARunHitBox();
-
-	void LuckyDestroy();
+	UBoxComponent* DodgeBoxComp;
 
 protected:
-	// Called when the game starts or when spawned
 	UPROPERTY(VisibleInstanceOnly)
 	class ARunnerGameModeBase* RunGameMode;
 	
