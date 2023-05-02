@@ -25,11 +25,18 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UTextBlock* ScoreMultiplierTxt;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UImage* Health1Img;
+	class UImage* P1Health1Img;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UImage* Health2Img;
+	class UImage* P1Health2Img;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UImage* Health3Img;
+	class UImage* P1Health3Img;
+
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UImage* P2Health1Img;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UImage* P2Health2Img;
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UImage* P2Health3Img;
 
 	void RemoveHealth(UImage* targetImage);
 

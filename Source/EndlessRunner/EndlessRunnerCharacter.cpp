@@ -9,6 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "RunnerGameModeBase.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -49,6 +50,8 @@ AEndlessRunnerCharacter::AEndlessRunnerCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	RunGameMode =  Cast<ARunnerGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 }
 
 void AEndlessRunnerCharacter::BeginPlay()
@@ -71,21 +74,62 @@ void AEndlessRunnerCharacter::BeginPlay()
 
 void AEndlessRunnerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
+	EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+	
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
+		if(shouldBindInput)
+		{
+			//Jumping
+            		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+            		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+            
+            		//Moving
+            		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::Move);
+            
+            		//Looking
+            		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEndlessRunnerCharacter::Look);
+            
+            		//PLAYER 2
+            		EnhancedInputComponent->BindAction(ArrowMoveAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::P2Move);
+			
+            		EnhancedInputComponent->BindAction(ArrowJumpAction, ETriggerEvent::Triggered, this, &AEndlessRunnerCharacter::P2Jump);
+					EnhancedInputComponent->BindAction(ArrowJumpAction, ETriggerEvent::Completed, this, &AEndlessRunnerCharacter::P2StopJumping);
+		}
 		
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
-		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::Move);
-
-		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEndlessRunnerCharacter::Look);
-
 	}
 
+}
+
+void AEndlessRunnerCharacter::P2Move(const FInputActionValue& Value)
+{
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	if(Controller != nullptr)
+	{
+		if(MovementVector.X > 0)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Actor name: %s"), *RunGameMode->Player2->GetName());
+			//RunGameMode->Player2->AddActorLocalOffset(FVector(0,135.f,0));
+			UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->AddActorLocalOffset(FVector(0,135.f,0));
+		}
+		else
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("Actor name: %s"), *RunGameMode->Player2->GetName());
+			//RunGameMode->Player2->AddActorLocalOffset(FVector(0,-135.f,0));
+			UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->AddActorLocalOffset(FVector(0,-135.f,0));
+		}
+	}
+}
+
+void AEndlessRunnerCharacter::P2Jump()
+{
+	UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->Jump();
+}
+
+void AEndlessRunnerCharacter::P2StopJumping()
+{
+	UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->StopJumping();
 }
 
 void AEndlessRunnerCharacter::Move(const FInputActionValue& Value)

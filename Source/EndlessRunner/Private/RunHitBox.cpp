@@ -25,7 +25,14 @@ void ARunHitBox::OnDamageBoxOverlap(UPrimitiveComponent* OverlappedComponent, AA
 
 	if(PlayerCharacter)
 	{
-		RunGameMode->ReduceHealth();
+		if(PlayerCharacter->Tags.Contains(FName("p1")))
+		{
+			RunGameMode->ReduceHealth(0);
+		}
+		else
+		{
+			RunGameMode->ReduceHealth(1);
+		}
 	}
 }
 

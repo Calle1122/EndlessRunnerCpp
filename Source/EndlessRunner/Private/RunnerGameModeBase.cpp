@@ -8,26 +8,29 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
-void ARunnerGameModeBase::EnableDamageTaking()
-{
-	IFrameMode=false;
-
-	Player1Mesh->SetMaterial(0, BaseMat1);
-	Player1Mesh->SetMaterial(1, BaseMat2);
-	Player1Mesh->SetMaterial(2, BaseMat3);
-}
-
 void ARunnerGameModeBase::BeginPlay()
 {
+	CreateInitialTiles();
+	
 	RunWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
 	RunWidget->AddToViewport(9999);
 
-	GetWorld()->SpawnActor<AEndlessRunnerCharacter>(Player2Class, FVector(0, 250, 100), FRotator(0, 0, 0));
+	//Player2 = GetWorld()->SpawnActor<AEndlessRunnerCharacter>(Player2Class, FVector(0, 250, 100), FRotator(0, 0, 0));
+	Player2 = Cast<AEndlessRunnerCharacter>(UGameplayStatics::CreatePlayer(GetWorld(), 1, true));
 	
-	CreateInitialTiles();
-	
-	ACharacter* Player1 = Cast<ACharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	AEndlessRunnerCharacter* Player1 = Cast<AEndlessRunnerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	Player1Mesh = Player1->GetMesh();
+	Player2Mesh = Cast<AEndlessRunnerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 1))->GetMesh();
+
+	Player2Mesh->SetMaterial(0, PinkBaseMat1);
+	Player2Mesh->SetMaterial(1, PinkBaseMat2);
+	Player2Mesh->SetMaterial(2, PinkBaseMat3);
+
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetCharacter()->SetActorLocation(FVector(0,-250,100));
+	UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->SetActorLocation(FVector(0,250,100));
+
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetCharacter()->Tags.Add(FName("p1"));
+	UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->Tags.Add(FName("p2"));
 }
 
 void ARunnerGameModeBase::Tick(float DeltaSeconds)
@@ -98,35 +101,71 @@ void ARunnerGameModeBase::AddTile()
 	}
 }
 
-void ARunnerGameModeBase::ReduceHealth()
+void ARunnerGameModeBase::ReduceHealth(int PlayerIndex)
 {
-	if(IFrameMode==false)
+	if(PlayerIndex == 0)
 	{
-		PlayerHealth--;
-		IFrameMode=true;
+		if(P1IFrameMode==false)
+		{
+			Player1Health--;
+			P1IFrameMode=true;
 
-		Player1Mesh->SetMaterial(0, IMaterial);
-		Player1Mesh->SetMaterial(1, IMaterial);
-		Player1Mesh->SetMaterial(2, IMaterial);
+			Player1Mesh->SetMaterial(0, IMaterial);
+			Player1Mesh->SetMaterial(1, IMaterial);
+			Player1Mesh->SetMaterial(2, IMaterial);
 		
-		GetWorldTimerManager().SetTimer(IFrameHandle, this, &ARunnerGameModeBase::EnableDamageTaking, IFrameTime, false);
+			GetWorldTimerManager().SetTimer(IFrameHandle, this, &ARunnerGameModeBase::P1EnableDamageTaking, IFrameTime, false);
 		
-		switch (PlayerHealth)
-		{
-		case 2:
-			RunWidget->RemoveHealth(RunWidget->Health3Img);
-			break;
-		case 1:
-			RunWidget->RemoveHealth(RunWidget->Health2Img);
-			break;
-		case 0:
-			RunWidget->RemoveHealth(RunWidget->Health1Img);
-			break;
-		}
+			switch (Player1Health)
+			{
+			case 2:
+				RunWidget->RemoveHealth(RunWidget->P1Health3Img);
+				break;
+			case 1:
+				RunWidget->RemoveHealth(RunWidget->P1Health2Img);
+				break;
+			case 0:
+				RunWidget->RemoveHealth(RunWidget->P1Health1Img);
+				break;
+			}
 	
-		if(PlayerHealth<=0)
+			if(Player1Health<=0)
+			{
+				EndRun();
+			}
+		}
+	}
+
+	else
+	{
+		if(P1IFrameMode==false)
 		{
-			EndRun();
+			Player2Health--;
+			P2IFrameMode=true;
+
+			Player2Mesh->SetMaterial(0, IMaterial);
+			Player2Mesh->SetMaterial(1, IMaterial);
+			Player2Mesh->SetMaterial(2, IMaterial);
+		
+			GetWorldTimerManager().SetTimer(IFrameHandle, this, &ARunnerGameModeBase::P2EnableDamageTaking, IFrameTime, false);
+		
+			switch (Player2Health)
+			{
+			case 2:
+				RunWidget->RemoveHealth(RunWidget->P2Health3Img);
+				break;
+			case 1:
+				RunWidget->RemoveHealth(RunWidget->P2Health2Img);
+				break;
+			case 0:
+				RunWidget->RemoveHealth(RunWidget->P2Health1Img);
+				break;
+			}
+	
+			if(Player2Health<=0)
+			{
+				EndRun();
+			}
 		}
 	}
 }
@@ -140,6 +179,24 @@ void ARunnerGameModeBase::EndRun()
 
 	EndScreenWidget->InitializeEndScreen();
 	EndScreenWidget->RegisterScore();
+}
+
+void ARunnerGameModeBase::P1EnableDamageTaking()
+{
+	P1IFrameMode=false;
+
+	Player1Mesh->SetMaterial(0, BaseMat1);
+	Player1Mesh->SetMaterial(1, BaseMat2);
+	Player1Mesh->SetMaterial(2, BaseMat3);
+}
+
+void ARunnerGameModeBase::P2EnableDamageTaking()
+{
+	P2IFrameMode=false;
+
+	Player2Mesh->SetMaterial(0, PinkBaseMat1);
+	Player2Mesh->SetMaterial(1, PinkBaseMat2);
+	Player2Mesh->SetMaterial(2, PinkBaseMat3);
 }
 
 void ARunnerGameModeBase::ChangeMultiplier(float NewMultiplier)

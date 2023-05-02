@@ -31,7 +31,9 @@ public:
 	int NumberOfInitialTiles = 10;
 
 	UPROPERTY(EditAnywhere, Category="GameConfig")
-	int PlayerHealth = 3;
+	int Player1Health = 3;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	int Player2Health = 3;
 
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	int ProjectilePercentChance = 1;
@@ -47,9 +49,6 @@ public:
 	UPROPERTY(EditAnywhere, Category="UI")
 	TSubclassOf<UEndScreenHUD> EndScreenInterface;
 
-	UPROPERTY(EditAnywhere, Category="GameConfig")
-	TSubclassOf<AEndlessRunnerCharacter> Player2Class;
-
 	UPROPERTY(VisibleInstanceOnly, Category="Runtime")
 	UArrowComponent* NextTileArrow;
 	
@@ -60,7 +59,7 @@ public:
 	void AddTile();
 
 	UFUNCTION(BlueprintCallable)
-	void ReduceHealth();
+	void ReduceHealth(int PlayerIndex);
 
 	UFUNCTION(BlueprintCallable)
 	void EndRun();
@@ -77,11 +76,15 @@ public:
 	
 	float Score;
 
+	UPROPERTY(EditAnywhere, Category="Player2")
+	AEndlessRunnerCharacter* Player2;
+	
 	//I Frame Handling
 	USkeletalMeshComponent* Player1Mesh;
 	USkeletalMeshComponent* Player2Mesh;
 	
-	bool IFrameMode;
+	bool P1IFrameMode;
+	bool P2IFrameMode;
 
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	float IFrameTime = 1.f;
@@ -94,12 +97,19 @@ public:
 	UMaterialInterface* BaseMat2;
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	UMaterialInterface* BaseMat3;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* PinkBaseMat1;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* PinkBaseMat2;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* PinkBaseMat3;
 	
 	UPROPERTY()
 	FTimerHandle IFrameHandle;
 
 	UFUNCTION()
-	void EnableDamageTaking();
+	void P1EnableDamageTaking();
+	void P2EnableDamageTaking();
 	
 protected:
 	virtual void BeginPlay() override;
