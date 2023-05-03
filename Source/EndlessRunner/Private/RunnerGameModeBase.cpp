@@ -2,6 +2,8 @@
 
 
 #include "EndlessRunner/Public/RunnerGameModeBase.h"
+
+#include "Obstacle.h"
 #include "RunGameHUD.h"
 #include "RunHitBox.h"
 #include "Blueprint/UserWidget.h"
@@ -9,9 +11,45 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
+void ARunnerGameModeBase::SaveGame()
+{
+	FLeaderboardItem NewItem;
+	NewItem.Name1 = Player1Name;
+	NewItem.Name2 = Player2Name;
+	NewItem.Score = Score;
+	SaveGameInstance->LeaderboardItems.Add(NewItem);
+
+	ScoreboardItems.Add(NewItem);
+	ScoreboardItems.Sort();
+
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("Highscore"), 0);
+}
+
+void ARunnerGameModeBase::LoadGame()
+{
+	if(UGameplayStatics::DoesSaveGameExist("Highscore", 0))
+	{
+		SaveGameInstance = Cast<USaveFileHandler>(UGameplayStatics::LoadGameFromSlot("Highscore", 0));
+	}
+	else
+	{
+		SaveGameInstance = Cast<USaveFileHandler>(UGameplayStatics::CreateSaveGameObject(USaveFileHandler::StaticClass()));
+	}
+
+	for (FLeaderboardItem item : SaveGameInstance->LeaderboardItems)
+	{
+		ScoreboardItems.Add(item);
+	}
+
+	ScoreboardItems.Sort();
+}
+
 void ARunnerGameModeBase::BeginPlay()
 {
 	CreateInitialTiles();
+
+	Player1Name = FString("CoolTester");
+	Player2Name = FString("EpicGamer");
 	
 	RunWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
 	RunWidget->AddToViewport(9999);
@@ -37,6 +75,11 @@ void ARunnerGameModeBase::BeginPlay()
 void ARunnerGameModeBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if(GameOver)
+	{
+		return;
+	}
 	
 	Score+=DeltaSeconds*ScoreMultiplier;
 	RunWidget->ScoreTxt->SetText(FText::FromString(FString::FromInt((int)Score)));
@@ -180,6 +223,11 @@ void ARunnerGameModeBase::EndRun()
 
 	EndScreenWidget->InitializeEndScreen();
 	EndScreenWidget->RegisterScore();
+
+	LoadGame();
+	SaveGame();
+	
+	EndScreenWidget->DisplayHighscores(ScoreboardItems);
 }
 
 void ARunnerGameModeBase::P1EnableDamageTaking()
@@ -228,11 +276,11 @@ void ARunnerGameModeBase::P1Dodge()
 	if(FMath::RandRange(1, 4) > 3)
 	{
 		TArray<AActor*> FoundActors;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARunHitBox::StaticClass(), FoundActors);
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AObstacle::StaticClass(), FoundActors);
 		
-		int IndexPicker = FMath::RandRange(0, FoundActors.Num());
+		int IndexPicker = FMath::RandRange(0, FoundActors.Num()-1);
 
-		Cast<ARunHitBox>(FoundActors[IndexPicker])->LuckyDestroy();
+		Cast<AObstacle>(FoundActors[IndexPicker])->LuckyDestroy();
 		
 		RunWidget->PlayLuckyAnimation(0);
 	}
@@ -243,11 +291,11 @@ void ARunnerGameModeBase::P2Dodge()
 	if(FMath::RandRange(1, 4) > 3)
 	{
 		TArray<AActor*> FoundActors;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARunHitBox::StaticClass(), FoundActors);
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AObstacle::StaticClass(), FoundActors);
 		
-		int IndexPicker = FMath::RandRange(0, FoundActors.Num());
+		int IndexPicker = FMath::RandRange(0, FoundActors.Num()-1);
 
-		Cast<ARunHitBox>(FoundActors[IndexPicker])->LuckyDestroy();
+		Cast<AObstacle>(FoundActors[IndexPicker])->LuckyDestroy();
 		
 		RunWidget->PlayLuckyAnimation(1);
 	}

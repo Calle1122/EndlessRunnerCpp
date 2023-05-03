@@ -3,31 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
-#include "DodgeBox.h"
-#include "RunHitBox.generated.h"
+#include "Obstacle.generated.h"
 
 UCLASS()
-class ENDLESSRUNNER_API ARunHitBox : public AActor
+class ENDLESSRUNNER_API AObstacle : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
+	AObstacle();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Component")
-	UBoxComponent* DamageBox;
-	
-	ARunHitBox();
+	USceneComponent* RootSceneComponent;
+
+	void LuckyDestroy();
 
 protected:
 	// Called when the game starts or when spawned
-	UPROPERTY(VisibleInstanceOnly)
-	class ARunnerGameModeBase* RunGameMode;
-	
-	UFUNCTION()
-	void OnDamageBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-	
 	virtual void BeginPlay() override;
 
 public:	

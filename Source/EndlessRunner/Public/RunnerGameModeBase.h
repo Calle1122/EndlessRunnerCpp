@@ -6,6 +6,7 @@
 #include "EndScreenHUD.h"
 #include "RunGameHUD.h"
 #include "RunTile.h"
+#include "SaveFileHandler.h"
 #include "EndlessRunner/EndlessRunnerCharacter.h"
 #include "GameFramework/GameModeBase.h"
 #include "RunnerGameModeBase.generated.h"
@@ -117,6 +118,24 @@ public:
 	UFUNCTION()
 	void P1EnableDamageTaking();
 	void P2EnableDamageTaking();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool GameOver;
+
+	//Game saving
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Player1Name;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Player2Name;
+
+	USaveFileHandler* SaveGameInstance;
+	
+	void SaveGame();
+	void LoadGame();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FLeaderboardItem> ScoreboardItems; 
 	
 protected:
 	virtual void BeginPlay() override;
