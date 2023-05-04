@@ -63,7 +63,7 @@ public:
 	void ReduceHealth(int PlayerIndex);
 
 	UFUNCTION(BlueprintCallable)
-	void EndRun();
+	void TryEndRun();
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeMultiplier(float NewMultiplier);
@@ -82,8 +82,15 @@ public:
 	
 	float Score;
 
+	UPROPERTY(EditAnywhere, Category="Player1")
+	AEndlessRunnerCharacter* Player1;
+	UPROPERTY(EditAnywhere, Category="Player1")
+	int Player1Lane;
+	
 	UPROPERTY(EditAnywhere, Category="Player2")
 	AEndlessRunnerCharacter* Player2;
+	UPROPERTY(EditAnywhere, Category="Player1")
+	int Player2Lane;
 	
 	//I Frame Handling
 	USkeletalMeshComponent* Player1Mesh;
@@ -117,11 +124,34 @@ public:
 
 	UFUNCTION()
 	void P1EnableDamageTaking();
+	UFUNCTION()
 	void P2EnableDamageTaking();
+
+	void SetPlayerInvincible(int PlayerIndex);
+
+	//Respawning
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool P1Dead;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool P2Dead;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool GameOver;
 
+	UPROPERTY()
+	FTimerHandle RespawnHandleP1;
+	UPROPERTY()
+	FTimerHandle RespawnHandleP2;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	float RespawnTime = 3.f;
+
+	UFUNCTION()
+	void RespawnPlayer1();
+	UFUNCTION()
+	void RespawnPlayer2();
+	
 	//Game saving
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

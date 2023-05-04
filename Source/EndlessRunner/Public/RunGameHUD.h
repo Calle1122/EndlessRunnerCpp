@@ -16,7 +16,9 @@ class ENDLESSRUNNER_API URunGameHUD : public UUserWidget
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Textures")
-	class UTexture2D* FullHeartTexture;
+	class UTexture2D* P1FullHeartTexture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Textures")
+	class UTexture2D* P2FullHeartTexture;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Textures")
 	class UTexture2D* EmptyHeartTexture; 
 	
@@ -44,6 +46,8 @@ public:
 	class UWidgetAnimation* P2LuckyDodgeAnim;
 	
 	void RemoveHealth(UImage* targetImage);
+
+	void RespawnHealthImages(int PlayerIndex);
 
 	void UpdateMultiplierTxt(float NewMultiplier);
 

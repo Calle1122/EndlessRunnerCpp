@@ -56,6 +56,9 @@ public:
 
 	void P2Jump();
 	void P2StopJumping();
+
+	void Jump() override;
+	void StopJumping() override;
 	
 	UPROPERTY(VisibleInstanceOnly)
     	class ARunnerGameModeBase* RunGameMode;

@@ -81,8 +81,8 @@ void AEndlessRunnerCharacter::SetupPlayerInputComponent(class UInputComponent* P
 		if(shouldBindInput)
 		{
 			//Jumping
-            		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-            		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+            		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::Jump);
+            		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AEndlessRunnerCharacter::StopJumping);
             
             		//Moving
             		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::Move);
@@ -93,7 +93,7 @@ void AEndlessRunnerCharacter::SetupPlayerInputComponent(class UInputComponent* P
             		//PLAYER 2
             		EnhancedInputComponent->BindAction(ArrowMoveAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::P2Move);
 			
-            		EnhancedInputComponent->BindAction(ArrowJumpAction, ETriggerEvent::Triggered, this, &AEndlessRunnerCharacter::P2Jump);
+            		EnhancedInputComponent->BindAction(ArrowJumpAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::P2Jump);
 					EnhancedInputComponent->BindAction(ArrowJumpAction, ETriggerEvent::Completed, this, &AEndlessRunnerCharacter::P2StopJumping);
 		}
 		
@@ -103,66 +103,90 @@ void AEndlessRunnerCharacter::SetupPlayerInputComponent(class UInputComponent* P
 
 void AEndlessRunnerCharacter::P2Move(const FInputActionValue& Value)
 {
+	if(RunGameMode->P2Dead)
+	{
+		return;
+	}
+	
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if(Controller != nullptr)
 	{
 		if(MovementVector.X > 0)
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("Actor name: %s"), *RunGameMode->Player2->GetName());
-			//RunGameMode->Player2->AddActorLocalOffset(FVector(0,135.f,0));
-			UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->AddActorLocalOffset(FVector(0,135.f,0));
+			if(RunGameMode->Player2Lane > 2){return;}
+			RunGameMode->Player2Lane++;
+			RunGameMode->Player2->AddActorLocalOffset(FVector(0,135.f,0));
 		}
 		else
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("Actor name: %s"), *RunGameMode->Player2->GetName());
-			//RunGameMode->Player2->AddActorLocalOffset(FVector(0,-135.f,0));
-			UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->AddActorLocalOffset(FVector(0,-135.f,0));
+			if(RunGameMode->Player2Lane < 2){return;}
+			RunGameMode->Player2Lane--;
+			RunGameMode->Player2->AddActorLocalOffset(FVector(0,-135.f,0));
 		}
 	}
 }
 
 void AEndlessRunnerCharacter::P2Jump()
 {
-	UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->Jump();
+	if(RunGameMode->P2Dead)
+	{
+		return;
+	}
+	
+	RunGameMode->Player2->Super::Jump();
 }
 
 void AEndlessRunnerCharacter::P2StopJumping()
 {
-	UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->StopJumping();
+	if(RunGameMode->P2Dead)
+	{
+		return;
+	}
+	
+	RunGameMode->Player2->Super::StopJumping();
+}
+
+void AEndlessRunnerCharacter::Jump()
+{
+	if(RunGameMode->P1Dead)
+	{
+		return;
+	}
+	
+	Super::Jump();
+}
+
+void AEndlessRunnerCharacter::StopJumping()
+{
+	if(RunGameMode->P1Dead)
+	{
+		return;
+	}
+	
+	Super::StopJumping();
 }
 
 void AEndlessRunnerCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
+	if(RunGameMode->P1Dead)
 	{
-		/*
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		return;
+	}
 	
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
-		*/
-
-		if(MovementVector.X > 0)
-		{
-			AddActorLocalOffset(FVector(0,135.f,0));
-		}
-		else
-		{
-			AddActorLocalOffset(FVector(0,-135.f,0));
-		}
+	FVector2D MovementVector = Value.Get<FVector2D>();
+	
+	if(MovementVector.X > 0)
+	{
+		if(RunGameMode->Player1Lane > 2){return;}
+		RunGameMode->Player1Lane++;
+		RunGameMode->Player1->AddActorLocalOffset(FVector(0,135.f,0));
+	}
+	else
+	{
+		if(RunGameMode->Player1Lane < 2){return;}
+		RunGameMode->Player1Lane--;
+		RunGameMode->Player1->AddActorLocalOffset(FVector(0,-135.f,0));
 	}
 }
 

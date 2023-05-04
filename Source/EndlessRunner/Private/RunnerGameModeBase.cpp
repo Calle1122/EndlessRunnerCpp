@@ -54,10 +54,11 @@ void ARunnerGameModeBase::BeginPlay()
 	RunWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
 	RunWidget->AddToViewport(9999);
 
-	//Player2 = GetWorld()->SpawnActor<AEndlessRunnerCharacter>(Player2Class, FVector(0, 250, 100), FRotator(0, 0, 0));
 	Player2 = Cast<AEndlessRunnerCharacter>(UGameplayStatics::CreatePlayer(GetWorld(), 1, true));
 	
-	AEndlessRunnerCharacter* Player1 = Cast<AEndlessRunnerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	Player1 = Cast<AEndlessRunnerCharacter>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetCharacter());
+	Player2 = Cast<AEndlessRunnerCharacter>(UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter());
+	
 	Player1Mesh = Player1->GetMesh();
 	Player2Mesh = Cast<AEndlessRunnerCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 1))->GetMesh();
 
@@ -67,6 +68,9 @@ void ARunnerGameModeBase::BeginPlay()
 
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetCharacter()->SetActorLocation(FVector(0,-250,100));
 	UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->SetActorLocation(FVector(0,250,100));
+
+	Player1Lane = 2;
+	Player2Lane = 2;
 
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetCharacter()->Tags.Add(FName("p1"));
 	UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->Tags.Add(FName("p2"));
@@ -80,9 +84,18 @@ void ARunnerGameModeBase::Tick(float DeltaSeconds)
 	{
 		return;
 	}
+
+	FVector Player1Loc = Player1->GetActorLocation();
+	Player1->SetActorLocation(FVector(Player1Loc.X, Player1Loc.Y, FMath::Max(90, Player1Loc.Z)));
+	
+	FVector Player2Loc = Player2->GetActorLocation();
+	Player2->SetActorLocation(FVector(Player2Loc.X, Player2Loc.Y, FMath::Max(90, Player2Loc.Z)));
 	
 	Score+=DeltaSeconds*ScoreMultiplier;
-	RunWidget->ScoreTxt->SetText(FText::FromString(FString::FromInt((int)Score)));
+	if(IsValid(RunWidget))
+	{
+		RunWidget->ScoreTxt->SetText(FText::FromString(FString::FromInt((int)Score)));
+	}
 
 	MultiplierAddTimer+=DeltaSeconds/5;
 	if(MultiplierAddTimer>=1.f)
@@ -152,12 +165,9 @@ void ARunnerGameModeBase::ReduceHealth(int PlayerIndex)
 		if(P1IFrameMode==false)
 		{
 			Player1Health--;
-			P1IFrameMode=true;
+			SetPlayerInvincible(0);
 
-			Player1Mesh->SetMaterial(0, IMaterial);
-			Player1Mesh->SetMaterial(1, IMaterial);
-			Player1Mesh->SetMaterial(2, IMaterial);
-		
+			GetWorldTimerManager().ClearTimer(P1IFrameHandle);
 			GetWorldTimerManager().SetTimer(P1IFrameHandle, this, &ARunnerGameModeBase::P1EnableDamageTaking, IFrameTime, false);
 		
 			switch (Player1Health)
@@ -175,7 +185,15 @@ void ARunnerGameModeBase::ReduceHealth(int PlayerIndex)
 	
 			if(Player1Health<=0)
 			{
-				EndRun();
+				P1Dead=true;
+
+				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("visibility to false for P1"));
+				Player1Mesh->SetVisibility(false);
+				Player1->SetActorEnableCollision(false);
+
+				GetWorldTimerManager().ClearTimer(RespawnHandleP1);
+				GetWorldTimerManager().SetTimer(RespawnHandleP1, this, &ARunnerGameModeBase::RespawnPlayer1, RespawnTime, false);
+				TryEndRun();
 			}
 		}
 	}
@@ -185,12 +203,9 @@ void ARunnerGameModeBase::ReduceHealth(int PlayerIndex)
 		if(P2IFrameMode==false)
 		{
 			Player2Health--;
-			P2IFrameMode=true;
+			SetPlayerInvincible(1);
 
-			Player2Mesh->SetMaterial(0, IMaterial);
-			Player2Mesh->SetMaterial(1, IMaterial);
-			Player2Mesh->SetMaterial(2, IMaterial);
-		
+			GetWorldTimerManager().ClearTimer(P2IFrameHandle);
 			GetWorldTimerManager().SetTimer(P2IFrameHandle, this, &ARunnerGameModeBase::P2EnableDamageTaking, IFrameTime, false);
 		
 			switch (Player2Health)
@@ -208,26 +223,39 @@ void ARunnerGameModeBase::ReduceHealth(int PlayerIndex)
 	
 			if(Player2Health<=0)
 			{
-				EndRun();
+				P2Dead=true;
+
+				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("visibility to false for P2"));
+				Player2Mesh->SetVisibility(false);
+				Player2->SetActorEnableCollision(false);
+				
+				GetWorldTimerManager().ClearTimer(RespawnHandleP2);
+				GetWorldTimerManager().SetTimer(RespawnHandleP2, this, &ARunnerGameModeBase::RespawnPlayer2, RespawnTime, false);
+				TryEndRun();
 			}
 		}
 	}
 }
 
-void ARunnerGameModeBase::EndRun()
+void ARunnerGameModeBase::TryEndRun()
 {
-	RunWidget->RemoveFromParent();
-	
-	EndScreenWidget = CreateWidget<UEndScreenHUD>(GetWorld()->GetFirstPlayerController(), EndScreenInterface);
-	EndScreenWidget->AddToViewport(9999);
+	if(P1Dead&&P2Dead)
+	{
+		GameOver=true;
 
-	EndScreenWidget->InitializeEndScreen();
-	EndScreenWidget->RegisterScore();
-
-	LoadGame();
-	SaveGame();
+		RunWidget->RemoveFromParent();
 	
-	EndScreenWidget->DisplayHighscores(ScoreboardItems);
+		EndScreenWidget = CreateWidget<UEndScreenHUD>(GetWorld()->GetFirstPlayerController(), EndScreenInterface);
+		EndScreenWidget->AddToViewport(9999);
+
+		EndScreenWidget->InitializeEndScreen();
+		EndScreenWidget->RegisterScore();
+
+		LoadGame();
+		SaveGame();
+	
+		EndScreenWidget->DisplayHighscores(ScoreboardItems);
+	}
 }
 
 void ARunnerGameModeBase::P1EnableDamageTaking()
@@ -246,6 +274,69 @@ void ARunnerGameModeBase::P2EnableDamageTaking()
 	Player2Mesh->SetMaterial(0, PinkBaseMat1);
 	Player2Mesh->SetMaterial(1, PinkBaseMat2);
 	Player2Mesh->SetMaterial(2, PinkBaseMat3);
+}
+
+void ARunnerGameModeBase::SetPlayerInvincible(int PlayerIndex)
+{
+	if(PlayerIndex == 0)
+	{
+		P1IFrameMode=true;
+
+		Player1Mesh->SetMaterial(0, IMaterial);
+		Player1Mesh->SetMaterial(1, IMaterial);
+		Player1Mesh->SetMaterial(2, IMaterial);
+	}
+
+	else
+	{
+		P2IFrameMode=true;
+
+		Player2Mesh->SetMaterial(0, IMaterial);
+		Player2Mesh->SetMaterial(1, IMaterial);
+		Player2Mesh->SetMaterial(2, IMaterial);
+	}
+}
+
+void ARunnerGameModeBase::RespawnPlayer1()
+{
+	Player1Health = 3;
+	
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("visibility to true for P1"));
+	Player1Mesh->SetVisibility(true);
+	
+	Player1->SetActorLocation(FVector(0,-250,100), false);
+	Player1Lane = 2;
+
+	P1Dead = false;
+	
+	SetPlayerInvincible(0);
+
+	GetWorldTimerManager().ClearTimer(P1IFrameHandle);
+	GetWorldTimerManager().SetTimer(P1IFrameHandle, this, &ARunnerGameModeBase::P1EnableDamageTaking, IFrameTime, false);
+	
+	RunWidget->RespawnHealthImages(0);
+	Player1->SetActorEnableCollision(true);
+}
+
+void ARunnerGameModeBase::RespawnPlayer2()
+{
+	Player2Health = 3;
+	
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("visibility to true for P2"));
+	Player2Mesh->SetVisibility(true);
+	
+	Player2->SetActorLocation(FVector(0,250,100), false);
+	Player2Lane = 2;
+
+	P2Dead = false;
+	
+	SetPlayerInvincible(1);	
+
+	GetWorldTimerManager().ClearTimer(P2IFrameHandle);
+	GetWorldTimerManager().SetTimer(P2IFrameHandle, this, &ARunnerGameModeBase::P2EnableDamageTaking, IFrameTime, false);
+	
+	RunWidget->RespawnHealthImages(1);
+	Player2->SetActorEnableCollision(true);
 }
 
 void ARunnerGameModeBase::ChangeMultiplier(float NewMultiplier)
