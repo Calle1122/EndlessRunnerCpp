@@ -6,6 +6,15 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
+void URunGameHUD::PlayTutorialAnimations()
+{
+	PlayAnimation(LSMoveTutorial);
+	PlayAnimation(RSMoveTutorial);
+
+	PlayAnimation(LSJumpTutorial);
+	PlayAnimation(RSJumpTutorial);
+}
+
 void URunGameHUD::RemoveHealth(UImage* targetImage)
 {
 	targetImage->SetBrushFromTexture(EmptyHeartTexture);

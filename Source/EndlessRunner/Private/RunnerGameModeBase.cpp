@@ -191,7 +191,6 @@ void ARunnerGameModeBase::ReduceHealth(int PlayerIndex)
 			{
 				P1Dead=true;
 
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("visibility to false for P1"));
 				Player1Mesh->SetVisibility(false);
 				Player1->SetActorEnableCollision(false);
 
@@ -229,7 +228,6 @@ void ARunnerGameModeBase::ReduceHealth(int PlayerIndex)
 			{
 				P2Dead=true;
 
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("visibility to false for P2"));
 				Player2Mesh->SetVisibility(false);
 				Player2->SetActorEnableCollision(false);
 				
@@ -305,7 +303,6 @@ void ARunnerGameModeBase::RespawnPlayer1()
 {
 	Player1Health = 3;
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("visibility to true for P1"));
 	Player1Mesh->SetVisibility(true);
 	
 	Player1->SetActorLocation(FVector(0,-250,100), false);
@@ -326,7 +323,6 @@ void ARunnerGameModeBase::RespawnPlayer2()
 {
 	Player2Health = 3;
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Cyan, TEXT("visibility to true for P2"));
 	Player2Mesh->SetVisibility(true);
 	
 	Player2->SetActorLocation(FVector(0,250,100), false);
@@ -406,6 +402,8 @@ void ARunnerGameModeBase::OnGameStart()
 	
 	RunWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
 	RunWidget->AddToViewport(9999);
+
+	RunWidget->PlayTutorialAnimations();
 	
 	GameOver = false;
 }

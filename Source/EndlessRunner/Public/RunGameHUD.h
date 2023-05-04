@@ -44,6 +44,18 @@ public:
 	class UWidgetAnimation* P1LuckyDodgeAnim;
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	class UWidgetAnimation* P2LuckyDodgeAnim;
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* LSMoveTutorial;
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* RSMoveTutorial;
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* LSJumpTutorial;
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* RSJumpTutorial;
+
+	UFUNCTION()
+	void PlayTutorialAnimations();
 	
 	void RemoveHealth(UImage* targetImage);
 
