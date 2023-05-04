@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EndScreenHUD.h"
+#include "MainMenuHUD.h"
 #include "RunGameHUD.h"
 #include "RunTile.h"
 #include "SaveFileHandler.h"
@@ -45,6 +46,9 @@ public:
 	float ScoreMultiplier = 1.f;
 
 	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<UMainMenuHUD> MainMenuInterface;
+	
+	UPROPERTY(EditAnywhere, Category="UI")
 	TSubclassOf<URunGameHUD> UserInterface;
 
 	UPROPERTY(EditAnywhere, Category="UI")
@@ -77,6 +81,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void P2Dodge();
 
+	UFUNCTION(BlueprintCallable)
+	void OnGameStart();
+
+	UMainMenuHUD* MainMenuWidget;
 	URunGameHUD* RunWidget;
 	UEndScreenHUD* EndScreenWidget;
 	

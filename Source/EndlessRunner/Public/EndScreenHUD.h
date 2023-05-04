@@ -19,9 +19,7 @@ class ENDLESSRUNNER_API UEndScreenHUD : public UUserWidget
 public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UTextBlock* FinalScoreTxt;
-
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
-	class UButton* RestartBtn;
+	
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* MainMenuBtn;
 

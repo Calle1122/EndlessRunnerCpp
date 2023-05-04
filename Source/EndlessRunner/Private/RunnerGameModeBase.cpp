@@ -46,14 +46,6 @@ void ARunnerGameModeBase::LoadGame()
 
 void ARunnerGameModeBase::BeginPlay()
 {
-	CreateInitialTiles();
-
-	Player1Name = FString("CoolTester");
-	Player2Name = FString("EpicGamer");
-	
-	RunWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
-	RunWidget->AddToViewport(9999);
-
 	Player2 = Cast<AEndlessRunnerCharacter>(UGameplayStatics::CreatePlayer(GetWorld(), 1, true));
 	
 	Player1 = Cast<AEndlessRunnerCharacter>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetCharacter());
@@ -74,6 +66,15 @@ void ARunnerGameModeBase::BeginPlay()
 
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetCharacter()->Tags.Add(FName("p1"));
 	UGameplayStatics::GetPlayerController(GetWorld(), 1)->GetCharacter()->Tags.Add(FName("p2"));
+	
+	MainMenuWidget = CreateWidget<UMainMenuHUD>(GetWorld()->GetFirstPlayerController(), MainMenuInterface);
+	MainMenuWidget->AddToViewport(9999);
+
+	MainMenuWidget->InitializeMainMenu();
+
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+	
+	GameOver = true;
 }
 
 void ARunnerGameModeBase::Tick(float DeltaSeconds)
@@ -82,6 +83,9 @@ void ARunnerGameModeBase::Tick(float DeltaSeconds)
 
 	if(GameOver)
 	{
+		Player1->SetActorLocation(FVector(0,-250,100));
+		Player2->SetActorLocation(FVector(0,250,100));
+
 		return;
 	}
 
@@ -390,6 +394,20 @@ void ARunnerGameModeBase::P2Dodge()
 		
 		RunWidget->PlayLuckyAnimation(1);
 	}
+}
+
+void ARunnerGameModeBase::OnGameStart()
+{
+	CreateInitialTiles();
+	
+	MainMenuWidget->RemoveFromParent();
+
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+	
+	RunWidget = CreateWidget<URunGameHUD>(GetWorld()->GetFirstPlayerController(), UserInterface);
+	RunWidget->AddToViewport(9999);
+	
+	GameOver = false;
 }
 
 

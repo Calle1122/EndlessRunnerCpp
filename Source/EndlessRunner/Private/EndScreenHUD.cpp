@@ -10,7 +10,7 @@ void UEndScreenHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	RestartBtn->OnClicked.AddDynamic(this, &UEndScreenHUD::RestartGame);
+	MainMenuBtn->OnClicked.AddDynamic(this, &UEndScreenHUD::RestartGame);
 }
 
 void UEndScreenHUD::InitializeEndScreen()
@@ -19,6 +19,7 @@ void UEndScreenHUD::InitializeEndScreen()
 	check(RunGameMode);
 
 	GetWorld()->GetFirstPlayerController()->SetPause(true);
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 }
 
 void UEndScreenHUD::RegisterScore()
