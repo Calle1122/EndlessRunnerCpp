@@ -92,4 +92,16 @@ Currently the player gets teleported side to side. I want to add a linear interp
   When one of the players die, the game continues. Three seconds after dying, a player respawns with full health. This means that the run only ends if both players are dead at the same time. This makes for some interseting tactics where the players should try taking turns dying to refresh their health. For this mechanic i mostly used the FTimerHandles and different states for the players.
   
  ### Adressed issues from Part 1
+ * GameOver Screen
  
+ Made the buttons work to finish the game-loop.
+ 
+ * Highscore
+ 
+ As mentioned above there is now a working highscore system.
+ 
+ * Infinite Lane issue
+ 
+ I decided to limit the players movement to just the three lanes they have. Like mentioned in Part 1 I wanted to make use of the air beside the lanes but ended up scrapping this idea.
+ 
+ I did not Lerp movement or change the Score Multiplier like originally planned.
