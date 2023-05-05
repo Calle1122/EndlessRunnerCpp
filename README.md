@@ -11,6 +11,8 @@
  * [Movement (Running, Jumping & Lane Switching)](#movement)
  * [Random Projectile System (Difficulty Based)](#random-projectile-system)
  
+ Also see: [Planned Improvements for Part 2](#planned-improvements-for-part-2)
+ 
  ### C++ use | Part 1
   #### Infinite Generation
   System is divided into two classes:
@@ -71,14 +73,23 @@ Currently the player gets teleported side to side. I want to add a linear interp
  * [Highscore Save & Load](#highscore)
  * [Respawn Mechanic](#respawn)
  
+ Also see: [Adressed issues from Part 1](#adressed-issues-from-part-1)
+ 
  ### C++ use | Part 2
   #### Dual Lanes
+  The tile generation functions remains the same, but with the added functionality of copying over generated tiles to another set of lanes. This means that Player1 and Player2 get the same set of tiles to make them play with the same chances. However the players are cooperating for a good score, so having different lanes could have been fine as well, since it is not competetive.  
   
   #### Two Players
+  The game now spawns in a 2nd player upon launch. Player1 is now controlled with AD & Space, whilst Player2 uses the Left-Right & Up arrow keys. To make the input from 1 input device (the keyboard) control two characters, I use the first player as a form of input manager. The first player controller then has one set of methods binded to the AD & Space keys and another set for the Left-Right & Up keys. The second set targets the Player2 reference and executes the movement methods for that character. 
   
   #### Dodge Mechanic
+  Obstacles now know when they are dodged. If the player successfully dodges an obstacle there is a 25% chance of getting a "Lucky Dodge". A message will then be displayed on screen so the player knows they got one. Upon getting a Lucky Dodge, a random obstacle is selected and destroyed. Since the players are cooperating, the obstacles are not always selected from the set of lanes connected to the player that got the Lucky Dodge, but instead selected from all active obstacles. 
   
   #### Highscore
+  The score system works just like in Part 1, but when the run ends, the score is now saved along with the player names. The saving utilizes the SaveGame class in Unreal which allows saving and loading data using a .sav file. I decided to save and load a TArray of my own LeaderboardItem struct. The struct contains 2 strings: Name1 & Name2 (Entered in the Main Menu by the players), as well as an int for the Score. There is also an override for the < operator which makes it return (Score < anotherLeaderboardItem->Score) so that the structs can be sorted in order. The file is then loaded when the run ends and the previous highscores displayed. The run that just ended is then saved into that file and sorted.
   
   #### Respawn
+  When one of the players die, the game continues. Three seconds after dying, a player respawns with full health. This means that the run only ends if both players are dead at the same time. This makes for some interseting tactics where the players should try taking turns dying to refresh their health. For this mechanic i mostly used the FTimerHandles and different states for the players.
   
+ ### Adressed issues from Part 1
+ 
