@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
+#include "DodgeBox.h"
 #include "RunHitBox.generated.h"
 
 UCLASS()

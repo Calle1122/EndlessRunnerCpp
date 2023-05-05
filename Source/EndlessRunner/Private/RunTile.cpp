@@ -21,11 +21,6 @@ ARunTile::ARunTile()
 	TileSeamPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("SeamPoint"));
 	TileSeamPoint->SetupAttachment(RootSceneComponent);
 
-	DestroyTileTriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
-	DestroyTileTriggerBox->SetupAttachment(RootSceneComponent);
-	DestroyTileTriggerBox->SetBoxExtent(FVector(50.f, 500.f, 250.f));
-	DestroyTileTriggerBox->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
-
 	for (int i = 0; i < 10 + 1; i++)
 	{
 		UArrowComponent* NewArrow = CreateDefaultSubobject<UArrowComponent>(FName(FString::FromInt(i)));
@@ -41,8 +36,6 @@ void ARunTile::BeginPlay()
 
 	RunGameMode = Cast<ARunnerGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	check(RunGameMode);
-
-	DestroyTileTriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ARunTile::OnDestroyBoxOverlap);
 
 	for (UArrowComponent* ProjectilePos : ProjectilePositions)
 	{
@@ -62,28 +55,16 @@ void ARunTile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	RootSceneComponent->AddLocalOffset(FVector(-10,0,0));
-}
 
-void ARunTile::OnDestroyBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	AEndlessRunnerCharacter* PlayerCharacter = Cast<AEndlessRunnerCharacter>(OtherActor);
-
-	if(PlayerCharacter)
+	if(TileSeamPoint->GetComponentLocation().X < -750)
 	{
-		RunGameMode->AddTile();
-
-		GetWorldTimerManager().SetTimer(DestroyTileHandle, this, &ARunTile::DestroyTile, 2.f, false);
+		DestroyTile();
 	}
 }
 
 void ARunTile::DestroyTile()
 {
-	if(DestroyTileHandle.IsValid())
-	{
-		GetWorldTimerManager().ClearTimer(DestroyTileHandle);
-	}
-
+	RunGameMode->OnTileDestroy();
 	this->Destroy();
 }
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 #include "EndlessRunnerCharacter.generated.h"
 
 
@@ -37,19 +38,38 @@ class AEndlessRunnerCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	//ARROW MOVEMENT ACTIONS
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ArrowMoveAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ArrowJumpAction;
+
 public:
 	AEndlessRunnerCharacter();
+
+	UPROPERTY(EditAnywhere, Category="Config")
+	bool shouldBindInput;
 	
-
-protected:
-
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
+	void P2Move(const FInputActionValue& Value);
 
+	void P2Jump();
+	void P2StopJumping();
+
+	void Jump() override;
+	void StopJumping() override;
+	
+	UPROPERTY(VisibleInstanceOnly)
+    	class ARunnerGameModeBase* RunGameMode;
+	
+protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
 
+	UEnhancedInputComponent* EnhancedInput;
+
+	
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

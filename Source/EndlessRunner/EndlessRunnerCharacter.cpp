@@ -9,6 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "RunnerGameModeBase.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -49,6 +50,8 @@ AEndlessRunnerCharacter::AEndlessRunnerCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	RunGameMode =  Cast<ARunnerGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 }
 
 void AEndlessRunnerCharacter::BeginPlay()
@@ -71,54 +74,119 @@ void AEndlessRunnerCharacter::BeginPlay()
 
 void AEndlessRunnerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
+	EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+	
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
+		if(shouldBindInput)
+		{
+			//Jumping
+            		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::Jump);
+            		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AEndlessRunnerCharacter::StopJumping);
+            
+            		//Moving
+            		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::Move);
+            
+            		//Looking
+            		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEndlessRunnerCharacter::Look);
+            
+            		//PLAYER 2
+            		EnhancedInputComponent->BindAction(ArrowMoveAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::P2Move);
+			
+            		EnhancedInputComponent->BindAction(ArrowJumpAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::P2Jump);
+					EnhancedInputComponent->BindAction(ArrowJumpAction, ETriggerEvent::Completed, this, &AEndlessRunnerCharacter::P2StopJumping);
+		}
 		
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
-		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &AEndlessRunnerCharacter::Move);
-
-		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AEndlessRunnerCharacter::Look);
-
 	}
 
 }
 
-void AEndlessRunnerCharacter::Move(const FInputActionValue& Value)
+void AEndlessRunnerCharacter::P2Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
+	if(RunGameMode->P2Dead)
+	{
+		return;
+	}
+	
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
+	if(Controller != nullptr)
 	{
-		/*
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
-		*/
-
 		if(MovementVector.X > 0)
 		{
-			AddActorLocalOffset(FVector(0,135.f,0));
+			if(RunGameMode->Player2Lane > 2){return;}
+			RunGameMode->Player2Lane++;
+			RunGameMode->Player2->AddActorLocalOffset(FVector(0,135.f,0));
 		}
 		else
 		{
-			AddActorLocalOffset(FVector(0,-135.f,0));
+			if(RunGameMode->Player2Lane < 2){return;}
+			RunGameMode->Player2Lane--;
+			RunGameMode->Player2->AddActorLocalOffset(FVector(0,-135.f,0));
 		}
+	}
+}
+
+void AEndlessRunnerCharacter::P2Jump()
+{
+	if(RunGameMode->P2Dead)
+	{
+		return;
+	}
+	
+	RunGameMode->Player2->Super::Jump();
+}
+
+void AEndlessRunnerCharacter::P2StopJumping()
+{
+	if(RunGameMode->P2Dead)
+	{
+		return;
+	}
+	
+	RunGameMode->Player2->Super::StopJumping();
+}
+
+void AEndlessRunnerCharacter::Jump()
+{
+	if(RunGameMode->P1Dead)
+	{
+		return;
+	}
+	
+	Super::Jump();
+}
+
+void AEndlessRunnerCharacter::StopJumping()
+{
+	if(RunGameMode->P1Dead)
+	{
+		return;
+	}
+	
+	Super::StopJumping();
+}
+
+void AEndlessRunnerCharacter::Move(const FInputActionValue& Value)
+{
+	if(RunGameMode->P1Dead)
+	{
+		return;
+	}
+	
+	FVector2D MovementVector = Value.Get<FVector2D>();
+	
+	if(MovementVector.X > 0)
+	{
+		if(RunGameMode->Player1Lane > 2){return;}
+		RunGameMode->Player1Lane++;
+		RunGameMode->Player1->AddActorLocalOffset(FVector(0,135.f,0));
+	}
+	else
+	{
+		if(RunGameMode->Player1Lane < 2){return;}
+		RunGameMode->Player1Lane--;
+		RunGameMode->Player1->AddActorLocalOffset(FVector(0,-135.f,0));
 	}
 }
 

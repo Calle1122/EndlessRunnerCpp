@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "EndScreenHUD.h"
+#include "MainMenuHUD.h"
 #include "RunGameHUD.h"
 #include "RunTile.h"
+#include "SaveFileHandler.h"
+#include "EndlessRunner/EndlessRunnerCharacter.h"
 #include "GameFramework/GameModeBase.h"
 #include "RunnerGameModeBase.generated.h"
 
@@ -30,7 +33,9 @@ public:
 	int NumberOfInitialTiles = 10;
 
 	UPROPERTY(EditAnywhere, Category="GameConfig")
-	int PlayerHealth = 3;
+	int Player1Health = 3;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	int Player2Health = 3;
 
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	int ProjectilePercentChance = 1;
@@ -40,6 +45,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	float ScoreMultiplier = 1.f;
 
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<UMainMenuHUD> MainMenuInterface;
+	
 	UPROPERTY(EditAnywhere, Category="UI")
 	TSubclassOf<URunGameHUD> UserInterface;
 
@@ -56,24 +64,48 @@ public:
 	void AddTile();
 
 	UFUNCTION(BlueprintCallable)
-	void ReduceHealth();
+	void ReduceHealth(int PlayerIndex);
 
 	UFUNCTION(BlueprintCallable)
-	void EndRun();
+	void TryEndRun();
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeMultiplier(float NewMultiplier);
 	float MultiplierAddTimer = 0.f;
 
+	UFUNCTION(BlueprintCallable)
+	void OnTileDestroy();
+
+	UFUNCTION(BlueprintCallable)
+	void P1Dodge();
+	UFUNCTION(BlueprintCallable)
+	void P2Dodge();
+
+	UFUNCTION(BlueprintCallable)
+	void OnGameStart();
+
+	UMainMenuHUD* MainMenuWidget;
 	URunGameHUD* RunWidget;
 	UEndScreenHUD* EndScreenWidget;
 	
 	float Score;
 
-	//I Frame Handling
-	USkeletalMeshComponent* CharacterMesh;
+	UPROPERTY(EditAnywhere, Category="Player1")
+	AEndlessRunnerCharacter* Player1;
+	UPROPERTY(EditAnywhere, Category="Player1")
+	int Player1Lane;
 	
-	bool IFrameMode;
+	UPROPERTY(EditAnywhere, Category="Player2")
+	AEndlessRunnerCharacter* Player2;
+	UPROPERTY(EditAnywhere, Category="Player1")
+	int Player2Lane;
+	
+	//I Frame Handling
+	USkeletalMeshComponent* Player1Mesh;
+	USkeletalMeshComponent* Player2Mesh;
+	
+	bool P1IFrameMode;
+	bool P2IFrameMode;
 
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	float IFrameTime = 1.f;
@@ -86,15 +118,68 @@ public:
 	UMaterialInterface* BaseMat2;
 	UPROPERTY(EditAnywhere, Category="GameConfig")
 	UMaterialInterface* BaseMat3;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* PinkBaseMat1;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* PinkBaseMat2;
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	UMaterialInterface* PinkBaseMat3;
 	
 	UPROPERTY()
-	FTimerHandle IFrameHandle;
+	FTimerHandle P1IFrameHandle;
+	UPROPERTY()
+	FTimerHandle P2IFrameHandle;
 
 	UFUNCTION()
-	void EnableDamageTaking();
+	void P1EnableDamageTaking();
+	UFUNCTION()
+	void P2EnableDamageTaking();
+
+	void SetPlayerInvincible(int PlayerIndex);
+
+	//Respawning
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool P1Dead;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool P2Dead;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool GameOver;
+
+	UPROPERTY()
+	FTimerHandle RespawnHandleP1;
+	UPROPERTY()
+	FTimerHandle RespawnHandleP2;
+
+	UPROPERTY(EditAnywhere, Category="GameConfig")
+	float RespawnTime = 3.f;
+
+	UFUNCTION()
+	void RespawnPlayer1();
+	UFUNCTION()
+	void RespawnPlayer2();
+	
+	//Game saving
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Player1Name;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Player2Name;
+
+	USaveFileHandler* SaveGameInstance;
+	
+	void SaveGame();
+	void LoadGame();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FLeaderboardItem> ScoreboardItems; 
 	
 protected:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaSeconds) override;
+
+private:
+	bool canGenerateTile = true;
 };
