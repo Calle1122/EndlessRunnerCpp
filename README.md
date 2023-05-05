@@ -1,11 +1,15 @@
 # Endless Runner Game | C++ Course Assignment
 
+## Contents:
+### [Part 1](#part-1-features)
+### [Part 2](#part-2-features)
+
  ## Part 1 Features:
- * Infinite Generation
- * Health System
- * Score System
- * Movement (Running, Jumping & Lane Switching)
- * Random Projectile System (Difficulty Based)
+ * [Infinite Generation](#infinite-generation)
+ * [Health System](#health-system)
+ * [Score System](#score-system)
+ * [Movement (Running, Jumping & Lane Switching)](#movement)
+ * [Random Projectile System (Difficulty Based)](#random-projectile-system)
  
  ### C++ use | Part 1
   #### Infinite Generation
@@ -59,3 +63,22 @@ Currently the player can press A&D and go however far left and right they want. 
  * Lerp Movement
 
 Currently the player gets teleported side to side. I want to add a linear interpolation to smooth this out.
+
+## Part 2 Features:
+ * [Dual Lanes](#dual-lanes)
+ * [Two Players: 1 Keyboard](#two-players)
+ * [Dodge Mechanic (Lucky Dodge)](#dodge-mechanic)
+ * [Highscore Save & Load](#highscore)
+ * [Respawn Mechanic](#respawn)
+ 
+ ### C++ use | Part 2
+  #### Dual Lanes
+  
+  #### Two Players
+  
+  #### Dodge Mechanic
+  
+  #### Highscore
+  
+  #### Respawn
+  
